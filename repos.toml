@@ -74,28 +74,27 @@ origin = "https://github.com/yuval-openbb/dharmatech-openbb.git"
 upstream = "https://github.com/DidierRLopes/dharmatech-openbb.git"
 ref = "main"
 
-# ---- PLANNED (E7 / E9): uncomment after the fork exists in yuval-openbb, then `make bootstrap`.
-# All three have NO license → personal local use only.
-# [[repo]]
-# name = "opening-bell-daily-openbb"         # E7 · :7803
-# path = "apps/opening-bell-daily-openbb"
-# origin = "https://github.com/yuval-openbb/opening-bell-daily-openbb.git"
-# upstream = "https://github.com/DidierRLopes/opening-bell-daily-openbb.git"
-# ref = "main"
-#
-# [[repo]]
-# name = "openbb-datamule-indicators"        # E7 · :7804
-# path = "apps/openbb-datamule-indicators"
-# origin = "https://github.com/yuval-openbb/openbb-datamule-indicators.git"
-# upstream = "https://github.com/DidierRLopes/openbb-datamule-indicators.git"
-# ref = "main"
-#
-# [[repo]]
-# name = "openbb-rag-financial-research-agent"  # E9 · :7778 (Ollama only)
-# path = "apps/openbb-rag-financial-research-agent"
-# origin = "https://github.com/yuval-openbb/openbb-rag-financial-research-agent.git"
-# upstream = "https://github.com/sandole/openbb-rag-financial-research-agent.git"
-# ref = "main"
+# ---- apps added 2026-10-14 (E7 / E9). All three have NO license → personal local use only.
+[[repo]]
+name = "opening-bell-daily-openbb"         # E7 · :7803
+path = "apps/opening-bell-daily-openbb"
+origin = "https://github.com/yuval-openbb/opening-bell-daily-openbb.git"
+upstream = "https://github.com/DidierRLopes/opening-bell-daily-openbb.git"
+ref = "main"
+
+[[repo]]
+name = "openbb-datamule-indicators"        # E7 · :7804
+path = "apps/openbb-datamule-indicators"
+origin = "https://github.com/yuval-openbb/openbb-datamule-indicators.git"
+upstream = "https://github.com/DidierRLopes/openbb-datamule-indicators.git"
+ref = "main"
+
+[[repo]]
+name = "openbb-rag-financial-research-agent"  # E9 · :7778 (Ollama only)
+path = "apps/openbb-rag-financial-research-agent"
+origin = "https://github.com/yuval-openbb/openbb-rag-financial-research-agent.git"
+upstream = "https://github.com/sandole/openbb-rag-financial-research-agent.git"
+ref = "main"
 
 # ---- fork-only (no local clone; 2.4 GB) — for upstream PRs, e.g. the cftc fix ----
 [[repo]]
