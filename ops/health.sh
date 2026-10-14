@@ -28,8 +28,14 @@ check "widgets.json"                    200 http://127.0.0.1:7779/widgets.json
 check "data route rejects no-key"       401 http://127.0.0.1:7779/holdings_vs_target
 check "data route with key"             200 -H "X-API-Key: ${RESEARCH_BACKEND_API_KEY:-}" http://127.0.0.1:7779/macro_signals
 
+echo "workspace :3000 (OrbStack)"
+check "UI"                              200 http://127.0.0.1:3000/
+check "API /api/health"                 200 http://127.0.0.1:3000/api/health
+st=$(DOCKER_CONTEXT=orbstack docker inspect -f '{{.State.Health.Status}}' openbb-workspace 2>/dev/null)
+if [ "$st" = healthy ]; then printf "  ✅ %-34s %s\n" "container health" "$st"; else printf "  ❌ %-34s %s\n" "container health" "${st:-missing}"; fail=1; fi
+
 echo "bind check (nothing on 0.0.0.0 / *)"
-exposed=$(lsof -nP -iTCP:6900,8001,7779,3000,7777,8787,7801,7802 -sTCP:LISTEN 2>/dev/null | awk 'NR>1 && $9 !~ /^(127\.0\.0\.1|\[::1\]|localhost):/ {print $1" "$9}')
+exposed=$(lsof -nP -iTCP:6900,8001,7779,3000,7777,7778,8787,7801,7802,7803,7804 -sTCP:LISTEN 2>/dev/null | awk 'NR>1 && $9 !~ /^(127\.0\.0\.1|\[::1\]|localhost):/ {print $1" "$9}')
 if [ -z "$exposed" ]; then echo "  ✅ all listeners are loopback-only"; else echo "  ❌ exposed: $exposed"; fail=1; fi
 
 exit $fail

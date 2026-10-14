@@ -1,0 +1,23 @@
+# Self-hosted OpenBB Workspace Lite (built from yuval-openbb/openbb-workspace @ yuval/lite-bun-build).
+# Build:  cd ecosystem/openbb-workspace/lite && DOCKER_CONTEXT=orbstack IMAGE=yuval-openbb/workspace-lite:local \
+#           ./build-local.sh --local --platform linux/arm64     # --platform avoids a bash-3.2 empty-array bug
+# Run:    ops/run.sh up workspace      (uses DOCKER_CONTEXT=orbstack)
+name: openbb-platform
+services:
+  workspace:
+    image: yuval-openbb/workspace-lite:local
+    container_name: openbb-workspace
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3000:3000"          # loopback only
+    volumes:
+      - workspace-data:/data           # SQLite DB, generated secrets, admin creds
+    healthcheck:                       # upstream image's check calls curl, which isn't installed
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://localhost:3000/api/health',timeout=4)"]
+      interval: 30s
+      timeout: 5s
+      start_period: 30s
+      retries: 3
+volumes:
+  workspace-data:
+    name: openbb-workspace-data

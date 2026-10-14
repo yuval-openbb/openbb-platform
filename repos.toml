@@ -50,7 +50,7 @@ name = "openbb-workspace"   # upstream archived (frozen)
 path = "ecosystem/openbb-workspace"
 origin = "https://github.com/yuval-openbb/openbb-workspace.git"
 upstream = "https://github.com/OpenBB-finance/workspace.git"
-ref = "main"
+ref = "yuval/lite-bun-build"
 
 [[repo]]
 name = "openbb-copilot"     # upstream archived (frozen)

@@ -20,7 +20,7 @@ Repos: GitHub org [`yuval-openbb`](https://github.com/yuval-openbb). The manifes
 | ODP MCP `openbb-mcp` | http://127.0.0.1:8001/mcp | research/.venv | loopback only | ✅ E4 |
 | Claude Code `openbb` MCP | stdio (started by Claude Code) | research/.venv | — | ✅ E4 |
 | Research backend (19 widgets) | http://127.0.0.1:7779 | research/.venv | `X-API-Key: $RESEARCH_BACKEND_API_KEY` | ✅ E5 |
-| Workspace Lite | http://127.0.0.1:3000 | Docker (OrbStack) | admin login | E6 |
+| Workspace Lite | http://127.0.0.1:3000 | Docker (OrbStack), `ops/compose/workspace.yml`, image built from fork branch `yuval/lite-bun-build` | admin login (`docker --context orbstack exec openbb-workspace credentials`) | ✅ E6 |
 | Community apps | :7801+ | apps/<app>/.venv | — | E7 |
 | agent-rita / its MCP | :7777 / :8787 | ecosystem/agent-rita (bun) | — | E9 |
 | Ollama | :11434 | Homebrew service | — | E9 |
@@ -54,9 +54,21 @@ Keep the fork's `main` equal to upstream; put local changes on `yuval/<topic>` a
 - Never move a folder that contains a venv. Recreate the venv instead.
 - OpenBB is pinned at 4.7.2. For the V5 path, see `research/docs/V5_MIGRATION.md`.
 
+## Workspace: connect backends (once, in the browser)
+Workspace → **Apps / Data Connectors → Connect backend**:
+| Name | URL | Auth |
+|---|---|---|
+| OpenBB ODP | `http://127.0.0.1:6900` | Basic: `OPENBB_API_USERNAME` / `OPENBB_API_PASSWORD` (send as header `Authorization: Basic <base64 user:pass>` if no Basic option) |
+| Yuval Research | `http://127.0.0.1:7779` | header `X-API-Key: <RESEARCH_BACKEND_API_KEY>` |
+The values are in `~/.openbb_platform/.env`. If Workspace calls backends server-side (from inside the container), use `http://host.docker.internal:<port>` instead.
+
+Rebuild Workspace after upstream changes: `make sync`, rebase `yuval/lite-bun-build`, then rebuild (see `ops/compose/workspace.yml`).
+
 ## Troubleshooting
 | Symptom | Fix |
 |---|---|
 | `openbb-api` exits at startup with `'NoneType' ... strip` in `cftc_router.py` | `make -C research patch` |
 | `make health` shows 401 with auth | the API was started before the `.env` change; `make restart` |
+| Workspace container `unhealthy` | the upstream healthcheck needs curl; use the compose file (it overrides the check) |
+| `make up` doesn't start Workspace | OrbStack must be running (`orb start`); run.sh does this |
 | Claude Code `openbb` MCP not connected | `claude mcp get openbb`; the path must be `research/.venv/bin/openbb-mcp` |
