@@ -11,6 +11,7 @@ VENV="$ROOT/research/.venv/bin"
 SERVICES=(
   "openbb-api|6900|$ROOT/research|$VENV/openbb-api --host 127.0.0.1 --port 6900"
   "openbb-mcp|8001|$ROOT/research|$VENV/openbb-mcp --host 127.0.0.1 --port 8001 --tool-discovery"
+  "research-backend|7779|$ROOT/research|$VENV/uvicorn backends.yuval_research.main:app --host 127.0.0.1 --port 7779"
 )
 
 field() { echo "$1" | cut -d'|' -f"$2"; }
@@ -37,7 +38,7 @@ down() {
     alive "$n" && kill "$(pid_of "$n")" 2>/dev/null && stopped=1
     # venv python is a launcher stub: the real server is a child holding the port.
     for p in $(lsof -t -nP -iTCP:"$port" -sTCP:LISTEN 2>/dev/null); do
-      ps -o args= -p "$p" | grep -q -- "$n" && kill "$p" 2>/dev/null && stopped=1
+      ps -o args= -p "$p" | grep -q -E -- "$n|yuval_research" && kill "$p" 2>/dev/null && stopped=1
     done
     for _ in $(seq 1 20); do listening "$port" || break; sleep 0.5; done
     rm -f "$RUN/$n.pid"

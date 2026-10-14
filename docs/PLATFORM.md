@@ -19,7 +19,7 @@ Repos: GitHub org [`yuval-openbb`](https://github.com/yuval-openbb). The manifes
 | ODP REST `openbb-api` | http://127.0.0.1:6900 (docs: `/docs`) | research/.venv | HTTP Basic (`OPENBB_API_USERNAME/PASSWORD`) | ✅ E3 |
 | ODP MCP `openbb-mcp` | http://127.0.0.1:8001/mcp | research/.venv | loopback only | ✅ E4 |
 | Claude Code `openbb` MCP | stdio (started by Claude Code) | research/.venv | — | ✅ E4 |
-| Research backend | http://127.0.0.1:7779 | research/.venv | API key header | E5 |
+| Research backend (19 widgets) | http://127.0.0.1:7779 | research/.venv | `X-API-Key: $RESEARCH_BACKEND_API_KEY` | ✅ E5 |
 | Workspace Lite | http://127.0.0.1:3000 | Docker (OrbStack) | admin login | E6 |
 | Community apps | :7801+ | apps/<app>/.venv | — | E7 |
 | agent-rita / its MCP | :7777 / :8787 | ecosystem/agent-rita (bun) | — | E9 |

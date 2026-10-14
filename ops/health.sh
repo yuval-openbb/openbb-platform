@@ -23,6 +23,11 @@ check "MCP initialize"                  200 -X POST http://127.0.0.1:8001/mcp \
   -H 'Content-Type: application/json' -H 'Accept: application/json, text/event-stream' \
   -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"health","version":"0"}}}'
 
+echo "research-backend :7779"
+check "widgets.json"                    200 http://127.0.0.1:7779/widgets.json
+check "data route rejects no-key"       401 http://127.0.0.1:7779/holdings_vs_target
+check "data route with key"             200 -H "X-API-Key: ${RESEARCH_BACKEND_API_KEY:-}" http://127.0.0.1:7779/macro_signals
+
 echo "bind check (nothing on 0.0.0.0 / *)"
 exposed=$(lsof -nP -iTCP:6900,8001,7779,3000,7777,8787,7801,7802 -sTCP:LISTEN 2>/dev/null | awk 'NR>1 && $9 !~ /^(127\.0\.0\.1|\[::1\]|localhost):/ {print $1" "$9}')
 if [ -z "$exposed" ]; then echo "  ✅ all listeners are loopback-only"; else echo "  ❌ exposed: $exposed"; fail=1; fi
