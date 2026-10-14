@@ -37,10 +37,23 @@ make up        # start all services
 make status    # what's running
 make health    # functional checks (auth enforced, data flows, loopback-only)
 make logs S=openbb-api
+make backup / make agent-status
 make down
 make -C research report     # regenerate the research report
 ```
 In Claude Code, just ask for data ("use openbb: 10Y yield since September"); tool categories activate on demand.
+
+## Autostart, self-heal, backups (E8)
+- `make agent-install` installs LaunchAgent `com.yuval-openbb.agent`. At login and every 15 min it runs `ops/agent.sh`:
+  `run.sh up` (idempotent; restarts anything that died, starts OrbStack if needed), then `ops/backup.sh` if the newest backup is more than 20h old.
+- Why an applet: macOS privacy blocks launchd jobs from `~/Documents`. launchd only `open`s
+  `~/Applications/OpenBB Platform Agent.app`, which holds the one-time "access Documents" grant (System Settings → Privacy & Security → Files and Folders).
+  Reinstalling rebuilds the applet, so macOS may ask again.
+- `make agent-status` shows the last runs (log `.run/agent.log`). `make agent-uninstall` removes it; services keep running.
+- `make backup` writes `~/Backups/openbb-platform/openbb-platform-<stamp>.tar.gz` (mode 600; newest 14 kept): the Workspace DB (online SQLite backup)
+  + `secrets.env` (needed to decrypt the stored connector headers), `research/data`, `~/.openbb_platform`. **It contains secrets and holdings; never upload it.**
+- Restore the Workspace DB: `make down` → `docker --context orbstack cp openbb.db openbb-workspace:/data/openbb.db` (+ `secrets.env`) → `make up`.
+- Full stack RAM: about 2.5 GB of Python services + the about 2.4 GB OrbStack VM (Workspace itself is about 220 MB).
 
 ## Add a service
 1. Add one line to `SERVICES` in `ops/run.sh`: `name|port|working dir|command` (bind to 127.0.0.1).
@@ -90,5 +103,7 @@ Dharmatech's first `transactions` call downloads Treasury data (about 5 min) and
 | ODP widgets show "Not authenticated" but the connector test passes | the test only fetches the public `widgets.json`; the header value lacks `Basic ` |
 | An app widget shows `'App' object has no attribute 'equity'` | the venv resolved openbb V5; rebuild with `-c ../../research/requirements.lock` |
 | Workspace container `unhealthy` | the upstream healthcheck needs curl; use the compose file (it overrides the check) |
+| launchd job log says `Operation not permitted` | TCC: use `make agent-install` (applet), not a plain bash LaunchAgent |
+| agent runs once, then never again | a process kept the applet's stdout open; services must start via run.sh (`exec` + full redirect) |
 | `make up` doesn't start Workspace | OrbStack must be running (`orb start`); run.sh does this |
 | Claude Code `openbb` MCP not connected | `claude mcp get openbb`; the path must be `research/.venv/bin/openbb-mcp` |

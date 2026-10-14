@@ -38,7 +38,9 @@ up() {
       (cd "$dir" && docker compose -f "${cmd#compose:}" up -d >"$RUN/$n.log" 2>&1)
     else
       if alive "$n" || listening "$port"; then echo "  $n already running (:$port)"; continue; fi
-      (cd "$dir" && nohup $cmd >"$RUN/$n.log" 2>&1 & echo $! >"$RUN/$n.pid")
+      # exec + whole-group redirect: no wrapper subshell lingers holding the caller's stdout (the agent waits on it)
+      (cd "$dir" && exec nohup $cmd) >"$RUN/$n.log" 2>&1 </dev/null &
+      echo $! >"$RUN/$n.pid"
     fi
     for _ in $(seq 1 60); do listening "$port" && break; alive "$n" || break; sleep 1; done
     if listening "$port"; then echo "  $n up on 127.0.0.1:$port"; else echo "  $n FAILED (see: ops/run.sh logs $n)"; fi
