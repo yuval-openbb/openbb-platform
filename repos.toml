@@ -1,0 +1,82 @@
+# Manifest of every repo that makes up the platform. `make bootstrap` clones missing ones,
+# `make sync` fetches upstream and fast-forwards the fork's ref. Forks keep `main` == upstream;
+# local changes go on `yuval/<topic>` branches and get pinned here via `ref`.
+
+[[repo]]
+name = "openbb-research"
+path = "research"
+origin = "https://github.com/yuval-openbb/openbb-research.git"
+ref = "main"
+private = true
+
+# ---- ecosystem: frameworks / reference (read, learn, build from) ----
+[[repo]]
+name = "backends-for-openbb"
+path = "ecosystem/backends-for-openbb"
+origin = "https://github.com/yuval-openbb/backends-for-openbb.git"
+upstream = "https://github.com/openbq-org/backends-for-openbb.git"
+ref = "main"
+
+[[repo]]
+name = "agent-rita"
+path = "ecosystem/agent-rita"
+origin = "https://github.com/yuval-openbb/agent-rita.git"
+upstream = "https://github.com/openbq-org/agent-rita.git"
+ref = "main"
+
+[[repo]]
+name = "openbb-ai"
+path = "ecosystem/openbb-ai"
+origin = "https://github.com/yuval-openbb/openbb-ai.git"
+upstream = "https://github.com/openbq-org/openbb-ai.git"
+ref = "main"
+
+[[repo]]
+name = "agents-for-openbb"
+path = "ecosystem/agents-for-openbb"
+origin = "https://github.com/yuval-openbb/agents-for-openbb.git"
+upstream = "https://github.com/openbq-org/agents-for-openbb.git"
+ref = "main"
+
+[[repo]]
+name = "awesome-openbb"
+path = "ecosystem/awesome-openbb"
+origin = "https://github.com/yuval-openbb/awesome-openbb.git"
+upstream = "https://github.com/openbq-org/awesome-openbb.git"
+ref = "main"
+
+[[repo]]
+name = "openbb-workspace"   # upstream archived (frozen)
+path = "ecosystem/openbb-workspace"
+origin = "https://github.com/yuval-openbb/openbb-workspace.git"
+upstream = "https://github.com/OpenBB-finance/workspace.git"
+ref = "main"
+
+[[repo]]
+name = "openbb-copilot"     # upstream archived (frozen)
+path = "ecosystem/openbb-copilot"
+origin = "https://github.com/yuval-openbb/openbb-copilot.git"
+upstream = "https://github.com/OpenBB-finance/openbb-copilot.git"
+ref = "main"
+
+# ---- apps: community apps that run as services (own venv each; NO license -> personal use) ----
+[[repo]]
+name = "demo-risk"
+path = "apps/demo-risk"
+origin = "https://github.com/yuval-openbb/demo-risk.git"
+upstream = "https://github.com/deeleeramone/demo-risk.git"
+ref = "main"
+
+[[repo]]
+name = "dharmatech-openbb"
+path = "apps/dharmatech-openbb"
+origin = "https://github.com/yuval-openbb/dharmatech-openbb.git"
+upstream = "https://github.com/DidierRLopes/dharmatech-openbb.git"
+ref = "main"
+
+# ---- fork-only (no local clone; 2.4 GB) — for upstream PRs, e.g. the cftc fix ----
+[[repo]]
+name = "OpenBB"
+origin = "https://github.com/yuval-openbb/OpenBB.git"
+upstream = "https://github.com/openbq-org/OpenBB.git"
+clone = false

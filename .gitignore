@@ -1,0 +1,15 @@
+# Sub-repos are separate git repos (see repos.toml) — never vendored here.
+/research/
+/ecosystem/
+/apps/
+
+# Runtime state, secrets
+.run/
+.env
+.env.*
+!ops/.env.example
+*.pem
+*.key
+
+.DS_Store
+__pycache__/
