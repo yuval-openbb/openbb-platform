@@ -1,0 +1,9 @@
+# dharmatech-openbb pins 2021 packages (pandas 1.3.3 has no arm64 wheel). Same major APIs, installable on py3.11:
+#   cd apps/dharmatech-openbb && uv venv --python 3.11 .venv && uv pip install --python .venv/bin/python -r requirements.txt --override ../../ops/constraints/dharmatech-openbb.txt
+fastapi<0.100
+pydantic<2
+uvicorn<0.30
+pandas>=1.5,<2
+numpy<2
+plotly<6
+python-dotenv<2

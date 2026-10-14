@@ -21,7 +21,10 @@ Repos: GitHub org [`yuval-openbb`](https://github.com/yuval-openbb). The manifes
 | Claude Code `openbb` MCP | stdio (started by Claude Code) | research/.venv | — | ✅ E4 |
 | Research backend (19 widgets) | http://127.0.0.1:7779 | research/.venv | `X-API-Key: $RESEARCH_BACKEND_API_KEY` | ✅ E5 |
 | Workspace Lite | http://127.0.0.1:3000 | Docker (OrbStack), `ops/compose/workspace.yml`, image built from fork branch `yuval/lite-bun-build` | admin login (`docker --context orbstack exec openbb-workspace credentials`) | ✅ E6 |
-| Community apps | :7801+ | apps/<app>/.venv | — | E7 |
+| demo-risk (portfolio risk, Fama-French) | http://127.0.0.1:7801 | apps/demo-risk/.venv (py3.12) | — | ✅ E7 |
+| dharmatech (Fed net liquidity, TGA, MTS) | http://127.0.0.1:7802 | apps/dharmatech-openbb/.venv (py3.11) | — (FRED key injected by `ops/with-fred-key.sh`) | ✅ E7 |
+| opening-bell daily (market snapshot) | http://127.0.0.1:7803 | apps/opening-bell-daily-openbb/.venv (py3.12, openbb 4.7.2) | Workspace header `X-FRED-API-KEY` for the FRED widget | ✅ E7 |
+| datamule indicators (SEC-derived) | http://127.0.0.1:7804 | apps/openbb-datamule-indicators/.venv (py3.12) | — | ✅ E7 |
 | agent-rita / its MCP | :7777 / :8787 | ecosystem/agent-rita (bun) | — | E9 |
 | Ollama | :11434 | Homebrew service | — | E9 |
 
@@ -60,15 +63,32 @@ Workspace → **Apps / Data Connectors → Connect backend**:
 |---|---|---|
 | OpenBB ODP | `http://127.0.0.1:6900` | Basic: `OPENBB_API_USERNAME` / `OPENBB_API_PASSWORD` (send as header `Authorization: Basic <base64 user:pass>` if no Basic option) |
 | Yuval Research | `http://127.0.0.1:7779` | header `X-API-Key: <RESEARCH_BACKEND_API_KEY>` |
-The values are in `~/.openbb_platform/.env`. If Workspace calls backends server-side (from inside the container), use `http://host.docker.internal:<port>` instead.
+| Demo Risk | `http://127.0.0.1:7801` | none |
+| Dharmatech | `http://127.0.0.1:7802` | none |
+| Opening Bell | `http://127.0.0.1:7803` | header `X-FRED-API-KEY: <fred_api_key>` (from `user_settings.json`) |
+| Datamule Indicators | `http://127.0.0.1:7804` | none |
+The values are in `~/.openbb_platform/.env`. Workspace calls backends **from the browser** (verified: CORS preflights from `localhost:3000`), so `127.0.0.1` URLs are correct.
+The Authorization value must include the scheme: `Basic <base64 of user:password>` (make it with `printf %s 'user:pass' | base64`; `echo` adds a newline).
 
 Rebuild Workspace after upstream changes: `make sync`, rebase `yuval/lite-bun-build`, then rebuild (see `ops/compose/workspace.yml`).
+
+## E7 app venvs (rebuild recipe)
+Each app has its own venv (gitignored or listed in `.git/info/exclude`). Three apps run on fork branch `yuval/local-workspace` (CORS for localhost:3000).
+```bash
+cd apps/demo-risk                  && uv venv --python 3.12 .venv && uv pip install --python .venv/bin/python -e .
+cd apps/dharmatech-openbb          && uv venv --python 3.11 .venv && uv pip install --python .venv/bin/python -r requirements.txt --override ../../ops/constraints/dharmatech-openbb.txt
+cd apps/opening-bell-daily-openbb  && uv venv --python 3.12 .venv && uv pip install --python .venv/bin/python -r requirements.txt -c ../../research/requirements.lock
+cd apps/openbb-datamule-indicators && uv venv --python 3.12 .venv && uv pip install --python .venv/bin/python -r requirements.txt
+```
+Dharmatech's first `transactions` call downloads Treasury data (about 5 min) and caches `*.pkl` in its folder.
 
 ## Troubleshooting
 | Symptom | Fix |
 |---|---|
 | `openbb-api` exits at startup with `'NoneType' ... strip` in `cftc_router.py` | `make -C research patch` |
 | `make health` shows 401 with auth | the API was started before the `.env` change; `make restart` |
+| ODP widgets show "Not authenticated" but the connector test passes | the test only fetches the public `widgets.json`; the header value lacks `Basic ` |
+| An app widget shows `'App' object has no attribute 'equity'` | the venv resolved openbb V5; rebuild with `-c ../../research/requirements.lock` |
 | Workspace container `unhealthy` | the upstream healthcheck needs curl; use the compose file (it overrides the check) |
 | `make up` doesn't start Workspace | OrbStack must be running (`orb start`); run.sh does this |
 | Claude Code `openbb` MCP not connected | `claude mcp get openbb`; the path must be `research/.venv/bin/openbb-mcp` |

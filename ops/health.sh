@@ -9,7 +9,7 @@ fail=0
 
 check() {  # name  expected_code  curl-args...
   local name=$1 want=$2; shift 2
-  local got; got=$(curl -s -o /dev/null -m 15 -w '%{http_code}' "$@")
+  local got; got=$(curl -s -o /dev/null -m "${M:-15}" -w '%{http_code}' "$@")
   if [ "$got" = "$want" ]; then printf "  ✅ %-34s %s\n" "$name" "$got"; else printf "  ❌ %-34s got %s, want %s\n" "$name" "$got" "$want"; fail=1; fi
 }
 
@@ -33,6 +33,16 @@ check "UI"                              200 http://127.0.0.1:3000/
 check "API /api/health"                 200 http://127.0.0.1:3000/api/health
 st=$(DOCKER_CONTEXT=orbstack docker inspect -f '{{.State.Health.Status}}' openbb-workspace 2>/dev/null)
 if [ "$st" = healthy ]; then printf "  ✅ %-34s %s\n" "container health" "$st"; else printf "  ❌ %-34s %s\n" "container health" "${st:-missing}"; fail=1; fi
+
+echo "E7 apps :7801-7804"
+check "demo-risk widgets.json"          200 http://127.0.0.1:7801/widgets.json
+check "demo-risk Fama-French info"      200 http://127.0.0.1:7801/fama_french_info
+check "dharmatech widgets.json"         200 http://127.0.0.1:7802/widgets.json
+M=60 check "dharmatech fed net liquidity (FRED)" 200 http://127.0.0.1:7802/fed-net-liquidity
+check "opening-bell widgets.json"       200 http://127.0.0.1:7803/widgets.json
+M=90 check "opening-bell market snapshot"     200 http://127.0.0.1:7803/market_snapshot
+check "datamule widgets.json"           200 http://127.0.0.1:7804/widgets.json
+M=60 check "datamule consumer confidence"     200 "http://127.0.0.1:7804/consumer_confidence_widget?type=domestic"
 
 echo "bind check (nothing on 0.0.0.0 / *)"
 exposed=$(lsof -nP -iTCP:6900,8001,7779,3000,7777,7778,8787,7801,7802,7803,7804 -sTCP:LISTEN 2>/dev/null | awk 'NR>1 && $9 !~ /^(127\.0\.0\.1|\[::1\]|localhost):/ {print $1" "$9}')

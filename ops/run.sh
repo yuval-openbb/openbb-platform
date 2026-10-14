@@ -14,6 +14,11 @@ SERVICES=(
   "openbb-mcp|8001|$ROOT/research|$VENV/openbb-mcp --host 127.0.0.1 --port 8001 --tool-discovery"
   "workspace|3000|$ROOT|compose:ops/compose/workspace.yml"
   "research-backend|7779|$ROOT/research|$VENV/uvicorn backends.yuval_research.main:app --host 127.0.0.1 --port 7779"
+  # E7 community apps (own venv each; built per docs/PLATFORM.md)
+  "demo-risk|7801|$ROOT/apps/demo-risk|.venv/bin/openbb-api --app demo_risk/app.py --host 127.0.0.1 --port 7801"
+  "dharmatech|7802|$ROOT/apps/dharmatech-openbb|$ROOT/ops/with-fred-key.sh .venv/bin/uvicorn main:app --host 127.0.0.1 --port 7802"
+  "opening-bell|7803|$ROOT/apps/opening-bell-daily-openbb|.venv/bin/uvicorn main:app --host 127.0.0.1 --port 7803"
+  "datamule|7804|$ROOT/apps/openbb-datamule-indicators|.venv/bin/uvicorn main:app --host 127.0.0.1 --port 7804"
 )
 
 field() { echo "$1" | cut -d'|' -f"$2"; }
@@ -50,7 +55,7 @@ down() {
     alive "$n" && kill "$(pid_of "$n")" 2>/dev/null && stopped=1
     # venv python is a launcher stub: the real server is a child holding the port.
     for p in $(lsof -t -nP -iTCP:"$port" -sTCP:LISTEN 2>/dev/null); do
-      ps -o args= -p "$p" | grep -q -E -- "$n|yuval_research" && kill "$p" 2>/dev/null && stopped=1
+      ps -o args= -p "$p" | grep -q -E -- "$n|yuval_research|--port $port" && kill "$p" 2>/dev/null && stopped=1
     done
     for _ in $(seq 1 20); do listening "$port" || break; sleep 0.5; done
     rm -f "$RUN/$n.pid"

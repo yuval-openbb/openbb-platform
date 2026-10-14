@@ -65,7 +65,7 @@ name = "demo-risk"
 path = "apps/demo-risk"
 origin = "https://github.com/yuval-openbb/demo-risk.git"
 upstream = "https://github.com/deeleeramone/demo-risk.git"
-ref = "main"
+ref = "yuval/local-workspace"
 
 [[repo]]
 name = "dharmatech-openbb"
@@ -80,14 +80,14 @@ name = "opening-bell-daily-openbb"         # E7 · :7803
 path = "apps/opening-bell-daily-openbb"
 origin = "https://github.com/yuval-openbb/opening-bell-daily-openbb.git"
 upstream = "https://github.com/DidierRLopes/opening-bell-daily-openbb.git"
-ref = "main"
+ref = "yuval/local-workspace"
 
 [[repo]]
 name = "openbb-datamule-indicators"        # E7 · :7804
 path = "apps/openbb-datamule-indicators"
 origin = "https://github.com/yuval-openbb/openbb-datamule-indicators.git"
 upstream = "https://github.com/DidierRLopes/openbb-datamule-indicators.git"
-ref = "main"
+ref = "yuval/local-workspace"
 
 [[repo]]
 name = "openbb-rag-financial-research-agent"  # E9 · :7778 (Ollama only)
